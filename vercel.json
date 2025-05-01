@@ -1,7 +1,18 @@
 {
-  "buildCommand": "cd craques-academy && npm install && npm run build",
-  "devCommand": "cd craques-academy && npm run dev",
-  "installCommand": "cd craques-academy && npm install",
-  "framework": "vite",
-  "outputDirectory": "craques-academy/dist"
+  "version": 2,
+  "builds": [
+    {
+      "src": "craques-academy/package.json",
+      "use": "@vercel/static-build",
+      "config": {
+        "distDir": "dist"
+      }
+    }
+  ],
+  "routes": [
+    {
+      "src": "/(.*)",
+      "dest": "/$1"
+    }
+  ]
 } 
