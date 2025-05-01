@@ -1,7 +1,7 @@
 {
-  "buildCommand": "npm run build",
-  "devCommand": "npm run dev",
-  "installCommand": "npm install",
+  "buildCommand": "cd craques-academy && npm install && npm run build",
+  "devCommand": "cd craques-academy && npm run dev",
+  "installCommand": "cd craques-academy && npm install",
   "framework": "vite",
-  "outputDirectory": "dist"
+  "outputDirectory": "craques-academy/dist"
 } 
