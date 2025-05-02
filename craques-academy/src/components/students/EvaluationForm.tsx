@@ -57,7 +57,7 @@ export function EvaluationForm({
   const [mental, setMental] = useState<number>(initialData?.mental || 0);
   const [notes, setNotes] = useState(initialData?.notes || "");
   const [categoryFilter, setCategoryFilter] = useState<string>("all");
-
+  
   const { toast } = useToast();
 
   useEffect(() => {
@@ -121,8 +121,8 @@ export function EvaluationForm({
               : "Preencha os dados para criar uma nova avaliação."}
           </DialogDescription>
         </DialogHeader>
-        <div className="grid gap-4 py-4">
-          <div className="space-y-2">
+          <div className="grid gap-4 py-4">
+            <div className="space-y-2">
             <Label>Categoria</Label>
             <Select
               value={categoryFilter}
@@ -131,19 +131,19 @@ export function EvaluationForm({
             >
               <SelectTrigger>
                 <SelectValue placeholder="Filtre por categoria" />
-              </SelectTrigger>
-              <SelectContent>
+                </SelectTrigger>
+                <SelectContent>
                 <SelectItem value="all">Todas as Categorias</SelectItem>
                 {Array.from(new Set(studentsList.map(s => s.category))).map((cat) => (
                   <SelectItem key={cat} value={cat}>
                     {cat}
                   </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
 
-          <div className="space-y-2">
+            <div className="space-y-2">
             <Label>Aluno</Label>
             <Select
               value={selectedStudent?.id.toString()}
@@ -154,18 +154,18 @@ export function EvaluationForm({
               disabled={!!student}
             >
               <SelectTrigger>
-                <SelectValue placeholder="Selecione o aluno" />
-              </SelectTrigger>
-              <SelectContent>
+                  <SelectValue placeholder="Selecione o aluno" />
+                </SelectTrigger>
+                <SelectContent>
                 {filteredStudents.map((student) => (
                   <SelectItem key={student.id} value={student.id.toString()}>
                     {student.name} - {student.category}
                   </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            
           <div className="space-y-2">
             <Label>Data</Label>
             <Popover>
@@ -187,68 +187,68 @@ export function EvaluationForm({
                 />
               </PopoverContent>
             </Popover>
-          </div>
-
-          <div className="space-y-2">
+            </div>
+            
+              <div className="space-y-2">
             <Label>Avaliação Técnica</Label>
             <div className="flex items-center gap-4">
-              <Slider
+                <Slider
                 value={[technical]}
                 onValueChange={(value) => setTechnical(value[0])}
-                min={0}
-                max={10}
+                  min={0}
+                  max={10}
                 step={1}
                 className="flex-1"
-              />
+                />
               <span className="w-8 text-center font-medium">{technical}</span>
             </div>
-          </div>
-
-          <div className="space-y-2">
+              </div>
+              
+              <div className="space-y-2">
             <Label>Avaliação Tática</Label>
             <div className="flex items-center gap-4">
-              <Slider
+                <Slider
                 value={[tactical]}
                 onValueChange={(value) => setTactical(value[0])}
-                min={0}
-                max={10}
+                  min={0}
+                  max={10}
                 step={1}
                 className="flex-1"
-              />
+                />
               <span className="w-8 text-center font-medium">{tactical}</span>
             </div>
-          </div>
-
-          <div className="space-y-2">
+              </div>
+              
+              <div className="space-y-2">
             <Label>Avaliação Física</Label>
             <div className="flex items-center gap-4">
-              <Slider
+                <Slider
                 value={[physical]}
                 onValueChange={(value) => setPhysical(value[0])}
-                min={0}
-                max={10}
+                  min={0}
+                  max={10}
                 step={1}
                 className="flex-1"
-              />
+                />
               <span className="w-8 text-center font-medium">{physical}</span>
             </div>
-          </div>
-
-          <div className="space-y-2">
+              </div>
+              
+              <div className="space-y-2">
             <Label>Avaliação Mental</Label>
             <div className="flex items-center gap-4">
-              <Slider
+                <Slider
                 value={[mental]}
                 onValueChange={(value) => setMental(value[0])}
-                min={0}
-                max={10}
+                  min={0}
+                  max={10}
                 step={1}
                 className="flex-1"
               />
               <span className="w-8 text-center font-medium">{mental}</span>
             </div>
-          </div>
-
+              </div>
+              
           <div className="space-y-2">
             <Label>Observações</Label>
             <Textarea
@@ -256,16 +256,16 @@ export function EvaluationForm({
               onChange={(e) => setNotes(e.target.value)}
               placeholder="Digite as observações da avaliação..."
             />
+            </div>
           </div>
-        </div>
-        <DialogFooter>
+          <DialogFooter>
           <Button variant="outline" onClick={onClose}>
-            Cancelar
-          </Button>
+              Cancelar
+            </Button>
           <Button onClick={handleSave} disabled={!selectedStudent}>
             Salvar
-          </Button>
-        </DialogFooter>
+            </Button>
+          </DialogFooter>
       </DialogContent>
     </Dialog>
   );

@@ -178,7 +178,7 @@ const Avaliacoes = () => {
       }
 
       await loadEvaluations();
-      setIsEvaluationModalOpen(false);
+        setIsEvaluationModalOpen(false);
       setSelectedEvaluation(null);
       toast({
         title: "Sucesso",
@@ -579,24 +579,24 @@ const Avaliacoes = () => {
               </TableBody>
             </Table>
           </div>
+          </div>
         </div>
-      </div>
 
-      <EvaluationFilters
-        searchTerm={searchTerm}
-        setSearchTerm={setSearchTerm}
-        categoryFilter={categoryFilter}
-        setCategoryFilter={setCategoryFilter}
+        <EvaluationFilters
+          searchTerm={searchTerm}
+          setSearchTerm={setSearchTerm}
+          categoryFilter={categoryFilter}
+          setCategoryFilter={setCategoryFilter}
         categories={categories}
-      />
+        />
 
-      <EvaluationRadarCharts
-        students={students}
-        evaluations={evaluations}
-        getAverageRatings={getAverageRatings}
-      />
+        <EvaluationRadarCharts
+          students={students}
+          evaluations={evaluations}
+          getAverageRatings={getAverageRatings}
+        />
 
-      <EvaluationTrendChart evaluations={evaluations} />
+          <EvaluationTrendChart evaluations={evaluations} />
 
       <EvaluationTable
         evaluations={filteredEvaluations}
