@@ -28,7 +28,6 @@ export function ReceiptDialog({ open, onClose, payment }: ReceiptDialogProps) {
     try {
       // Create canvas from receipt content
       const canvas = await html2canvas(receiptRef.current, {
-        background: '#ffffff',
         logging: false,
       });
 
@@ -76,7 +75,6 @@ export function ReceiptDialog({ open, onClose, payment }: ReceiptDialogProps) {
 
     try {
       const canvas = await html2canvas(receiptRef.current, {
-        background: '#ffffff',
         logging: false,
       });
 
@@ -189,4 +187,4 @@ export function ReceiptDialog({ open, onClose, payment }: ReceiptDialogProps) {
       </DialogContent>
     </Dialog>
   );
-}
+} 
