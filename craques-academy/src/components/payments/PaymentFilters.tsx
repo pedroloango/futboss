@@ -1,4 +1,3 @@
-
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { 
@@ -19,8 +18,11 @@ interface PaymentFiltersProps {
   onMonthFilterChange: (value: string) => void;
   categoryFilter: string;
   onCategoryFilterChange: (value: string) => void;
+  paymentTypeFilter: string;
+  onPaymentTypeFilterChange: (value: string) => void;
   onClearFilters: () => void;
   categories: string[];
+  paymentTypes: string[];
 }
 
 export const PaymentFilters = ({
@@ -32,8 +34,11 @@ export const PaymentFilters = ({
   onMonthFilterChange,
   categoryFilter,
   onCategoryFilterChange,
+  paymentTypeFilter,
+  onPaymentTypeFilterChange,
   onClearFilters,
   categories,
+  paymentTypes,
 }: PaymentFiltersProps) => {
   return (
     <div className="flex flex-col sm:flex-row items-start sm:items-center space-y-2 sm:space-y-0 space-x-0 sm:space-x-2">
@@ -84,7 +89,20 @@ export const PaymentFilters = ({
           ))}
         </DropdownMenuContent>
       </DropdownMenu>
-      {(searchTerm || statusFilter || monthFilter || categoryFilter) && (
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Button variant="outline" className="w-full sm:w-auto">Tipo de Pagamento</Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent>
+          <DropdownMenuItem onClick={() => onPaymentTypeFilterChange("")}>Todos</DropdownMenuItem>
+          {paymentTypes.map((type) => (
+            <DropdownMenuItem key={type} onClick={() => onPaymentTypeFilterChange(type)}>
+              {type}
+            </DropdownMenuItem>
+          ))}
+        </DropdownMenuContent>
+      </DropdownMenu>
+      {(searchTerm || statusFilter || monthFilter || categoryFilter || paymentTypeFilter) && (
         <Button 
           variant="ghost" 
           size="icon"

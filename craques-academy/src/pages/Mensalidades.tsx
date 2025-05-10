@@ -30,17 +30,25 @@ const Mensalidades = () => {
   const [statusFilter, setStatusFilter] = useState("");
   const [monthFilter, setMonthFilter] = useState("");
   const [categoryFilter, setCategoryFilter] = useState("");
+  const [paymentTypeFilter, setPaymentTypeFilter] = useState("");
 
   const categories = useMemo(() => Array.from(new Set(payments.map(p => p.category))), [payments]);
+  const paymentTypes = useMemo(() => Array.from(new Set(payments.map(p => p.paymentType))), [payments]);
 
   useEffect(() => {
-    let result = [...payments];
+    let result = payments;
     if (searchTerm) result = result.filter(p => p.student.toLowerCase().includes(searchTerm.toLowerCase()));
     if (statusFilter) result = result.filter(p => p.status === statusFilter);
     if (categoryFilter) result = result.filter(p => p.category === categoryFilter);
     if (monthFilter) result = result.filter(p => p.month === monthFilter);
-    setFilteredPayments(result);
-  }, [payments, searchTerm, statusFilter, categoryFilter, monthFilter]);
+    if (paymentTypeFilter) result = result.filter(p => p.paymentType === paymentTypeFilter);
+    if (
+      result.length !== filteredPayments.length ||
+      result.some((p, i) => p.id !== filteredPayments[i]?.id)
+    ) {
+      setFilteredPayments(result);
+    }
+  }, [payments, searchTerm, statusFilter, categoryFilter, monthFilter, paymentTypeFilter]);
 
   const handleGenerateAllPayments = async () => {
     await supabase.rpc('generate_payments_for_active_students', { p_year: new Date().getFullYear() });
@@ -54,19 +62,25 @@ const Mensalidades = () => {
   const [selectedPayment, setSelectedPayment] = useState<Payment | null>(null);
   const { data: students = [] } = useStudents();
 
-  const handleConfirmPayment = async (payment: Payment) => {
+  const [isConfirmPaymentOpen, setIsConfirmPaymentOpen] = useState(false);
+  const [paymentToConfirm, setPaymentToConfirm] = useState<Payment | null>(null);
+
+  const handleConfirmPayment = (payment: Payment) => {
+    setPaymentToConfirm(payment);
+    setIsConfirmPaymentOpen(true);
+  };
+
+  const handleSaveConfirmedPayment = async (payment: Payment) => {
     try {
       const updatedPayment = {
         ...payment,
         status: "Pago" as const,
-        paymentDate: new Date().toLocaleDateString("pt-BR")
+        paymentDate: new Date().toLocaleDateString("pt-BR"),
+        paymentType: "Mensalidade",
       };
-
       await updatePayment.mutateAsync(updatedPayment);
-      
       setSelectedPayment(updatedPayment);
       setIsReceiptDialogOpen(true);
-      
       toast({
         title: "Pagamento confirmado",
         description: `O pagamento de ${payment.student} foi confirmado com sucesso.`,
@@ -76,6 +90,46 @@ const Mensalidades = () => {
       toast({
         title: "Erro ao confirmar pagamento",
         description: "Não foi possível confirmar o pagamento. Tente novamente.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsConfirmPaymentOpen(false);
+      setPaymentToConfirm(null);
+    }
+  };
+
+  const handleMarkPending = async (payment: Payment) => {
+    try {
+      const updatedPayment = {
+        ...payment,
+        status: "Pendente" as const,
+        paymentDate: undefined,
+      };
+      await updatePayment.mutateAsync(updatedPayment);
+      toast({
+        title: "Status alterado",
+        description: `O pagamento de ${payment.student} voltou para pendente.`,
+      });
+    } catch (error) {
+      toast({
+        title: "Erro ao alterar status",
+        description: "Não foi possível alterar o status. Tente novamente.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleDeletePayment = async (payment: Payment) => {
+    try {
+      await deletePayment.mutateAsync(payment.id);
+      toast({
+        title: "Pagamento excluído",
+        description: `O pagamento de ${payment.student} foi excluído.`,
+      });
+    } catch (error) {
+      toast({
+        title: "Erro ao excluir pagamento",
+        description: "Não foi possível excluir o pagamento. Tente novamente.",
         variant: "destructive",
       });
     }
@@ -122,13 +176,17 @@ const Mensalidades = () => {
           onMonthFilterChange={setMonthFilter}
           categoryFilter={categoryFilter}
           onCategoryFilterChange={setCategoryFilter}
+          paymentTypeFilter={paymentTypeFilter}
+          onPaymentTypeFilterChange={setPaymentTypeFilter}
           onClearFilters={() => {
             setSearchTerm("");
             setStatusFilter("");
             setMonthFilter("");
             setCategoryFilter("");
+            setPaymentTypeFilter("");
           }}
           categories={categories}
+          paymentTypes={paymentTypes}
         />
 
         <PaymentsTable
@@ -146,6 +204,8 @@ const Mensalidades = () => {
             setSelectedPayment(payment);
             setIsPaymentDetailsOpen(true);
           }}
+          onMarkPending={handleMarkPending}
+          onDeletePayment={handleDeletePayment}
         />
       </div>
 
@@ -195,6 +255,18 @@ const Mensalidades = () => {
         open={isPaymentDetailsOpen}
         onClose={() => setIsPaymentDetailsOpen(false)}
         payment={selectedPayment}
+      />
+
+      <PaymentForm
+        open={isConfirmPaymentOpen}
+        onClose={() => {
+          setIsConfirmPaymentOpen(false);
+          setPaymentToConfirm(null);
+        }}
+        onSave={handleSaveConfirmedPayment}
+        initialData={paymentToConfirm || undefined}
+        studentsList={students}
+        formTitle="Confirmar Pagamento"
       />
     </MainLayout>
   );

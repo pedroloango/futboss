@@ -1,4 +1,3 @@
-
 import { Payment } from "@/types/payment";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
@@ -20,6 +19,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Check, MoreVertical, QrCode, FileText, Info } from "lucide-react";
+import { useState } from "react";
 
 interface PaymentsTableProps {
   payments: Payment[];
@@ -27,6 +27,8 @@ interface PaymentsTableProps {
   onGeneratePix: (payment: Payment) => void;
   onViewReceipt: (payment: Payment) => void;
   onViewDetails: (payment: Payment) => void;
+  onMarkPending: (payment: Payment) => void;
+  onDeletePayment: (payment: Payment) => void;
 }
 
 export const PaymentsTable = ({
@@ -35,7 +37,14 @@ export const PaymentsTable = ({
   onGeneratePix,
   onViewReceipt,
   onViewDetails,
+  onMarkPending,
+  onDeletePayment,
 }: PaymentsTableProps) => {
+  const [page, setPage] = useState(1);
+  const pageSize = 30;
+  const totalPages = Math.ceil(payments.length / pageSize);
+  const paginatedPayments = payments.slice((page - 1) * pageSize, page * pageSize);
+
   return (
     <div className="border rounded-md overflow-x-auto">
       <Table>
@@ -48,12 +57,13 @@ export const PaymentsTable = ({
             <TableHead>Vencimento</TableHead>
             <TableHead>Status</TableHead>
             <TableHead>Método</TableHead>
+            <TableHead>Tipo de Pagamento</TableHead>
             <TableHead className="w-[120px]">Ações</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
-          {payments.length > 0 ? (
-            payments.map((payment) => (
+          {paginatedPayments.length > 0 ? (
+            paginatedPayments.map((payment) => (
               <TableRow key={payment.id}>
                 <TableCell className="font-medium">
                   <div className="flex items-center space-x-2">
@@ -93,6 +103,7 @@ export const PaymentsTable = ({
                   </Badge>
                 </TableCell>
                 <TableCell>{payment.paymentMethod}</TableCell>
+                <TableCell>{payment.paymentType}</TableCell>
                 <TableCell>
                   <div className="flex space-x-1">
                     {payment.status !== "Pago" && (
@@ -124,6 +135,14 @@ export const PaymentsTable = ({
                         <DropdownMenuItem onClick={() => onViewDetails(payment)}>
                           <Info className="mr-2 h-4 w-4" /> Detalhes
                         </DropdownMenuItem>
+                        {payment.status === "Pago" && (
+                          <DropdownMenuItem onClick={() => onMarkPending(payment)}>
+                            <Check className="mr-2 h-4 w-4 text-amber-500" /> Voltar para Pendente
+                          </DropdownMenuItem>
+                        )}
+                        <DropdownMenuItem onClick={() => onDeletePayment(payment)} className="text-red-600">
+                          Excluir
+                        </DropdownMenuItem>
                       </DropdownMenuContent>
                     </DropdownMenu>
                   </div>
@@ -132,13 +151,33 @@ export const PaymentsTable = ({
             ))
           ) : (
             <TableRow>
-              <TableCell colSpan={8} className="text-center py-6 text-muted-foreground">
+              <TableCell colSpan={9} className="text-center py-6 text-muted-foreground">
                 Nenhum pagamento encontrado.
               </TableCell>
             </TableRow>
           )}
         </TableBody>
       </Table>
+      {/* Controles de Paginação */}
+      {totalPages > 1 && (
+        <div className="flex justify-center items-center gap-2 py-4">
+          <button
+            className="px-3 py-1 rounded bg-gray-200 disabled:opacity-50"
+            onClick={() => setPage((p) => Math.max(1, p - 1))}
+            disabled={page === 1}
+          >
+            Anterior
+          </button>
+          <span>Página {page} de {totalPages}</span>
+          <button
+            className="px-3 py-1 rounded bg-gray-200 disabled:opacity-50"
+            onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+            disabled={page === totalPages}
+          >
+            Próxima
+          </button>
+        </div>
+      )}
     </div>
   );
 };

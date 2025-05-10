@@ -74,9 +74,12 @@ export function useDbPayments() {
         })() : null,
       };
       console.log('Creating payment with payload:', payload);
-      const { data, error } = await supabase.from('payments').insert([payload]);
-      console.log({ data, error });
-      if (error) throw error;
+      // @ts-expect-error: returning: 'minimal' não está tipado, mas é suportado pelo backend
+      const { data, error } = await (supabase.from('payments').insert([payload], { returning: 'minimal' }) as any);
+      if (error) {
+        console.error('Erro ao inserir pagamento:', error);
+        throw error;
+      }
     },
     onSuccess: () => qc.invalidateQueries({ queryKey: ['payments'] }),
   });
